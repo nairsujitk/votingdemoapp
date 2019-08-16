@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: voting-app-pod
+  namespace: voting-app
+  labels:
+    name: voting-app-pod
+    app: voting-app
+spec:
+  containers:
+    - name: voting-app
+      image: dockersamples/examplevotingapp_vote
+      ports:
+      - containerPort: 80
+ ---
+ apiVersion: v1
+kind: Service
+metadata: 
+  name: voting-service
+  namespace: voting-app
+  labels:
+    name: voting-service
+    app: voting-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    name: voting-app-pod
+    app: voting-app
+ ---
+ apiVersion: v1
+kind: Pod
+metadata: 
+  name: redis-pod
+  labels:
+    name: redis-pod
+    namespace: voting-app
+    app: voting-app
+spec:
+  containers:
+    - name: redis
+      image: redis
+      ports:
+      - containerPort: 6379
+ ---
+ apiVersion: v1
+kind: Service
+metadata: 
+  name: redis
+  namespace: voting-app
+  labels:
+    name: redis-service
+    app: voting-app
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    name: redis-pod
+    app: voting-app
+ ---
+ apiVersion: v1
+kind: Pod
+metadata: 
+  name: worker-app-pod
+  namespace: voting-app
+  labels:
+    name: worker-app-pod
+    app: voting-app
+spec:
+  containers:
+    - name: worker-app
+      image: dockersamples/examplevotingapp_worker
+ ---
+ apiVersion: v1
+kind: Pod
+metadata: 
+  name: postgress-pod
+  namespace: voting-app
+  labels:
+    name: postgress-pod
+    app: voting-app
+spec:
+  containers:
+    - name: postgress
+      image: postgres:9.4
+      ports:
+      - containerPort: 5432
+ ---
+ apiVersion: v1
+kind: Service
+metadata: 
+  name: db
+  namespace: voting-app
+  labels:
+    name: db-service
+    app: voting-app
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    name: postgress-pod
+    app: voting-app
+ ---
+ apiVersion: v1
+kind: Pod
+metadata: 
+  name: result-app-pod
+  namespace: voting-app
+  labels:
+    name: result-app-pod
+    app: voting-app
+spec:
+  containers:
+    - name: result-app
+      image: dockersamples/examplevotingapp_result
+      ports:
+      - containerPort: 80
+ ---
+ apiVersion: v1
+kind: Service
+metadata: 
+  name: result-service
+  namespace: voting-app
+  labels:
+    name: result-service
+    app: voting-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    name: result-app-pod
+    app: voting-app
